@@ -1,0 +1,6 @@
+        <Context path="/strppm" reloadable="true" docBase="strppm" crossContect="true">
+            <Resource name="jdbc/STRPPMPOOL" auth="Container" type="javax.sql.DataSource"
+                maxActive="-1" maxIdle="30" maxWait="10000" 
+                username="STRPPM" password="STRPPM" driverClassName="com.mysql.jdbc.Driver"
+                url="jdbc:mysql://localhost:3306/STRPPM"/>
+        </Context>

@@ -1,0 +1,3 @@
+<Context path="/pppm" reloadable="true" docBase="pppm" crossContect="true">
+  <Resource name="jdbc/PPPMPOOL" auth="Container" type="javax.sql.DataSource" maxActive="-1" maxIdle="30" maxWait="10000"  username="PPPM" password="PPPM" driverClassName="com.mysql.jdbc.Driver"  url="jdbc:mysql://localhost:3306/PPPM"/>
+</Context>

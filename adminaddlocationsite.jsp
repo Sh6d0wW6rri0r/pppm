@@ -1,0 +1,125 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+  <head>
+    <title>Untitled Document</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <style type="text/css"> 
+      body { color: black; font-family: arial; font-size: 11px}
+      h1 { color: black; font-family: arial; font-size: 16px}
+    </style> 
+  </head>
+
+    <%-- PPPM.ORG, the OpenSource PPM (Portfolio, Project and Program management) system --%>
+    <%-- Copyright (C) 2012  Olivier Moulin --%>
+
+    <%-- This program is free software: you can redistribute it and/or modify --%>
+    <%-- it under the terms of the GNU General Public License as published by --%>
+    <%-- the Free Software Foundation, version 3 of the License. --%>
+
+    <%-- This program is distributed in the hope that it will be useful, --%>
+    <%-- but WITHOUT ANY WARRANTY; without even the implied warranty of --%>
+    <%-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the --%>
+    <%-- GNU General Public License for more details. --%>
+
+    <%-- You should have received a copy of the GNU General Public License --%>
+    <%-- along with this program.  If not, see http://www.gnu.org/licenses/. --%>
+
+
+  <%@ page import = "java.sql.*" %>
+  <%@ page import = "java.util.*" %>
+  <%@ page import = "javax.sql.*" %>
+  <%@ page import = "javax.naming.*" %>
+  <%@ page import = "javax.servlet.*" %>
+  <%@ page import = "javax.servlet.http.*" %>
+
+  <body background="images/fond.gif">
+    <script language="JavaScript" src="javascript/calendar_db.js"></script>
+    <link rel="stylesheet" href="javascript/calendar.css">
+    <%
+      // session attributes
+      String Userlogin = (String)session.getAttribute("LOGIN");
+
+
+      if (Userlogin==null) {
+        out.print("<script language=\"JavaScript\">");
+        out.print("top.location='index.jsp?TIMEOUT=TRUE';");
+        out.print("</script>");
+      } else {
+        String POOLNAME=(String)session.getAttribute("POOLNAME");
+
+        // database connection
+        Context initCtx = new InitialContext();
+        DataSource ds = (DataSource) initCtx.lookup("java:comp/env/jdbc/"+POOLNAME);
+        Connection Conn = ds.getConnection();
+
+        // JSP parameters
+        String act = request.getParameter("TODO");
+        String SITEID = request.getParameter("SITEID");
+      	out.print("<hr>");
+        String NAME = "";
+        String DIVISIONID = "";
+        String BITLID = "";
+        if (act.equals("ADD")) {
+          SITEID="";
+          out.print("<form name=\"formFILTER\" method=\"post\" action=\"adminlocation.jsp?TODO=SITADD\" target=\"appliFrame\">");
+        } else {
+          out.print("<form name=\"formFILTER\" method=\"post\" action=\"adminlocation.jsp?TODO=SITMOD&SITEID="+SITEID+"\" target=\"appliFrame\">");
+        }
+        if (act.equals("MOD")) {
+          Statement STR01 = Conn.createStatement();
+          String QR01 = "SELECT NAME,DIVISIONID,BITLID FROM LOCATION WHERE ID='"+SITEID+"'";
+          ResultSet R01 = STR01.executeQuery(QR01);
+          if (R01.next()) {
+            NAME=R01.getString("NAME");
+            DIVISIONID=R01.getString("DIVISIONID");
+            BITLID=R01.getString("BITLID");
+          }
+          STR01.close();
+        }
+        out.print("<table>");
+        if (act.equals("ADD")) {
+          out.print("<tr><td>ID : </td><td><input name=\"SITEID\" type=\"text\" size=\"50\" value=\"\"></td></tr>");
+        }   
+        out.print("<tr><td>Name : </td><td><input name=\"NAME\" type=\"text\" size=\"50\" value=\""+NAME+"\"></td></tr>");
+        out.print("<tr><td>Division : </td><td><select name=\"DIVISIONID\">");
+        Statement STR02 = Conn.createStatement();
+        String QR02 = "SELECT ID,NAME FROM DIVISION";
+        ResultSet R02 = STR02.executeQuery(QR02);
+        while(R02.next()) {
+          out.print("<option");
+          if (DIVISIONID.equals(R02.getString("ID"))) {
+            out.print(" selected ");
+          }
+          out.print(">"+R02.getString("ID")+" - "+R02.getString("NAME")+"</option>");
+        }
+        STR02.close();
+        out.print("</select></td></tr>");
+        out.print("<tr><td>Business IT Leader : </td><td><select name=\"BITLID\">");
+        Statement STR03 = Conn.createStatement();
+        String QR03 = "SELECT ID,NAME,FORNAME FROM EMPLOYEE";
+        ResultSet R03 = STR03.executeQuery(QR03);
+        while(R03.next()) {
+          out.print("<option");
+          if (BITLID.equals(R03.getString("ID"))) {
+            out.print(" selected ");
+          }
+          out.print(">"+R03.getString("ID")+" - "+R03.getString("NAME")+" "+R03.getString("FORNAME")+"</option>");
+        }
+        STR03.close();
+        out.print("</select></td></tr>");
+        if (act.equals("ADD")) {
+          out.print("<table><tr><td>&nbsp;</td><td><INPUT border=0 src=\"icons/add.png\" type=image Value=submit></td>");
+          out.print("<td><A HREF=\"adminlocation.jsp?TODO=NONE\"><img border=0 src=\"icons/cancel.png\"></A></td></tr></table>");
+        } else {  
+          out.print("<table><tr><td>&nbsp;</td><td><INPUT border=0 src=\"icons/modify.png\" type=image Value=submit></td>");
+          out.print("<td><A HREF=\"adminlocation.jsp?TODO=NONE\"><img border=0 src=\"icons/cancel.png\"></A></td></tr></table>");
+        }
+        out.print("</table>");
+        out.print("</form>");
+        Conn.close();
+      }
+
+    %>
+  </body>
+</html>
